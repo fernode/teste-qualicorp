@@ -1,16 +1,19 @@
 <template>
   <div id="app">
+    <Social />
     <SearchPlans />
   </div>
 </template>
 
 <script>
 import SearchPlans from "./components/SearchPlans.vue";
+import Social from "./components/Social.vue";
 
 export default {
   name: "App",
   components: {
     SearchPlans,
+    Social,
   },
 };
 </script>
