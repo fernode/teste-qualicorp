@@ -1,7 +1,7 @@
 <template>
   <main>
     <div class="loading" v-show="loading">
-      <orbit-spinner
+      <spring-spinner
         class="loading__icon"
         :animation-duration="1200"
         :size="60"
@@ -80,7 +80,7 @@
         </option>
       </select>
 
-      <button class="search-button">
+      <button class="search-button" type="button" v-on:click="getPlans($event)">
         <font-awesome-icon icon="search" />
         Ver planos disponíveis
       </button>
@@ -91,12 +91,12 @@
 <script>
 import { ibgeEndpoint, qualicorpEndpoint } from "@/services/api.js";
 import { apiKey1, apiKey2 } from "@/qualicorpKey.js";
-import { OrbitSpinner } from "epic-spinners";
+import { SpringSpinner } from "epic-spinners";
 
 export default {
   name: "SearchPlans",
   components: {
-    OrbitSpinner,
+    SpringSpinner,
   },
   data() {
     return {
@@ -164,7 +164,9 @@ export default {
         this.loading = false;
       }
     },
-    getPlans: async function () {},
+    getPlans: async function (e) {
+      e.prevent;
+    },
   },
 };
 </script>
@@ -181,18 +183,15 @@ main {
 .loading {
   width: 100vw;
   height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
   background: #060369;
+  opacity: 0.6;
   top: 0;
   left: 0;
   z-index: 99;
-
-  &__icon {
-    position: absolute;
-    top: 50%;
-    right: 50%;
-    left: 50%;
-  }
 }
 
 .text-box {
@@ -207,6 +206,7 @@ main {
     margin-top: 5rem;
     margin-bottom: 3rem;
     font-weight: 300;
+    font-size: 2.5rem;
   }
 }
 
@@ -214,6 +214,7 @@ form {
   color: #ffffff;
   font-size: 2.5rem;
   font-weight: 300;
+  text-align: center;
 
   select,
   input,
@@ -258,8 +259,8 @@ form {
     background: #ffba3f;
     display: block;
     text-align: center;
-    margin: 3rem auto 0 auto;
-    padding: 0.7rem;
+    margin: 5rem auto 0 auto;
+    padding: 0.9rem 2rem;
     border: none;
     border-radius: 2rem;
     font-weight: bold;
@@ -271,8 +272,12 @@ form {
 /* Mobile */
 @media (max-width: 768px) {
   form {
-    text-align: center;
+    margin: 2rem;
     font-size: 2.5rem;
+
+    .search-button {
+      padding: 1.2rem 2rem;
+    }
   }
 }
 </style>
