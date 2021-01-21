@@ -1,5 +1,14 @@
 <template>
   <main>
+    <div class="loading" v-show="loading">
+      <orbit-spinner
+        class="loading__icon"
+        :animation-duration="1200"
+        :size="60"
+        color="#ffba3f"
+      />
+    </div>
+
     <div class="text-box">
       <img src="../assets/logo.svg" alt="Logo qualicorp" />
       <h1>Busca por plano de saúde</h1>
@@ -82,11 +91,16 @@
 <script>
 import { ibgeEndpoint, qualicorpEndpoint } from "@/services/api.js";
 import { apiKey1, apiKey2 } from "@/qualicorpKey.js";
+import { OrbitSpinner } from "epic-spinners";
 
 export default {
   name: "SearchPlans",
+  components: {
+    OrbitSpinner,
+  },
   data() {
     return {
+      loading: false,
       states: [],
       cities: [],
       occupations: [],
@@ -110,6 +124,7 @@ export default {
   methods: {
     getCities: async function (e) {
       const stateId = e.target.value;
+      this.loading = true;
 
       try {
         await ibgeEndpoint(`${stateId}/municipios?orderBy=nome`).then((res) => {
@@ -117,9 +132,12 @@ export default {
         });
       } catch (error) {
         console.log(error);
+      } finally {
+        this.loading = false;
       }
     },
     getOccupation: async function () {
+      this.loading = true;
       try {
         await qualicorpEndpoint(
           `/profissao/${this.selectedState}/${this.selectedCity}?api-key=${apiKey1}`
@@ -128,9 +146,12 @@ export default {
         });
       } catch (error) {
         console.log(error);
+      } finally {
+        this.loading = false;
       }
     },
     getEntities: async function () {
+      this.loading = true;
       try {
         await qualicorpEndpoint(
           `/entidade/${this.selectedOcupation}/${this.selectedState}/${this.selectedCity}?api-key=${apiKey2}`
@@ -139,8 +160,11 @@ export default {
         });
       } catch (error) {
         console.log(error);
+      } finally {
+        this.loading = false;
       }
     },
+    getPlans: async function () {},
   },
 };
 </script>
@@ -151,6 +175,24 @@ main {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  position: relative;
+}
+
+.loading {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  background: #060369;
+  top: 0;
+  left: 0;
+  z-index: 99;
+
+  &__icon {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    left: 50%;
+  }
 }
 
 .text-box {
@@ -222,6 +264,7 @@ form {
     border-radius: 2rem;
     font-weight: bold;
     text-transform: uppercase;
+    cursor: pointer;
   }
 }
 
