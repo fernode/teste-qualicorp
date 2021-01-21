@@ -1,13 +1,13 @@
 <template>
   <main>
-    <div class="loading" v-show="loading">
+    <section class="loading" v-show="loading">
       <spring-spinner
         class="loading__icon"
         :animation-duration="1200"
         :size="60"
         color="#ffba3f"
       />
-    </div>
+    </section>
 
     <div class="text-box">
       <img src="../assets/logo.svg" alt="Logo qualicorp" />
@@ -22,6 +22,7 @@
         id="state"
         v-on:change="getCities($event)"
         v-model="selectedState"
+        required
       >
         <option value="" disabled selected>UF</option>
         <option v-for="state in states" :key="state.sigla" :value="state.sigla">
@@ -85,12 +86,38 @@
         Ver planos disponíveis
       </button>
     </form>
+
+    <section class="plans" v-show="showPlans">
+      <h2 class="plans__title">Planos de saúde disponíveis para você</h2>
+      <span class="plans__description"
+        >Encontramos {{ plans.total }} opções</span
+      >
+      <ul>
+        <li v-for="(plan, index) in plans.planos" :key="index">
+          <div class="container">
+            <div class="plans__info">
+              <img :src="plan.operadoraLogo" :alt="plan.plano" />
+              <h3>{{ plan.nome_plano_ans }}</h3>
+              <p>{{ plan.segmentacao }}</p>
+            </div>
+
+            <span class="plans__price">
+              <img
+                src="../assets/dollar.svg"
+                alt="Ilustração representando uma moeda"
+              />
+              R$ {{ plan.precos.total }}
+            </span>
+          </div>
+        </li>
+      </ul>
+    </section>
   </main>
 </template>
 
 <script>
 import { ibgeEndpoint, qualicorpEndpoint } from "@/services/api.js";
-import { apiKey1, apiKey2 } from "@/qualicorpKey.js";
+import { apiKey1, apiKey2, apiKey3 } from "@/qualicorpKey.js";
 import { SpringSpinner } from "epic-spinners";
 
 export default {
@@ -101,10 +128,12 @@ export default {
   data() {
     return {
       loading: false,
+      showPlans: false,
       states: [],
       cities: [],
       occupations: [],
       entities: [],
+      plans: [],
       selectedState: "",
       selectedCity: "",
       selectedOcupation: "",
@@ -152,6 +181,7 @@ export default {
     },
     getEntities: async function () {
       this.loading = true;
+
       try {
         await qualicorpEndpoint(
           `/entidade/${this.selectedOcupation}/${this.selectedState}/${this.selectedCity}?api-key=${apiKey2}`
@@ -164,14 +194,36 @@ export default {
         this.loading = false;
       }
     },
-    getPlans: async function (e) {
-      e.prevent;
+    getPlans: async function () {
+      this.loading = true;
+      this.showPlans = false;
+
+      try {
+        await qualicorpEndpoint({
+          method: "post",
+          url: `/plano?api-key=${apiKey3}`,
+          data: {
+            entidade: this.selectedEntity,
+            uf: this.selectedState,
+            cidade: this.selectedCity,
+            datanascimento: [this.selectedDate],
+          },
+        }).then((res) => {
+          this.plans = res.data;
+          console.log(this.selectedDate);
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.loading = false;
+        this.showPlans = true;
+      }
     },
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 main {
   display: flex;
   justify-content: center;
@@ -269,6 +321,83 @@ form {
   }
 }
 
+.plans {
+  margin-top: 6rem;
+  background: #3e3b8b;
+  width: 100vw;
+  padding-bottom: 10rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &__title {
+    font-size: 3.5rem;
+    margin-top: 3rem;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  &__description {
+    font-size: 1.4rem;
+    color: white;
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  &__info {
+    img {
+      max-width: 10rem;
+      margin-top: 1rem;
+      height: 6rem;
+    }
+
+    h3 {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 1.4rem;
+    }
+  }
+
+  &__price {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 600;
+
+    img {
+      margin-right: 1rem;
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+  }
+
+  ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    column-gap: 3.6rem;
+
+    li {
+      .container {
+        max-width: 85%;
+        height: 100%;
+        margin: 0 auto;
+      }
+
+      list-style: none;
+      background: white;
+      width: 26rem;
+      margin-top: 3rem;
+      border-radius: 10px;
+      height: 25rem;
+    }
+  }
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   form {
@@ -277,6 +406,13 @@ form {
 
     .search-button {
       padding: 1.2rem 2rem;
+    }
+  }
+
+  .plans {
+    ul {
+      padding-left: 0;
+      grid-template-columns: 1fr;
     }
   }
 }
