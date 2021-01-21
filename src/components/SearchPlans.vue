@@ -88,29 +88,36 @@
     </form>
 
     <section class="plans" v-show="showPlans">
-      <h2 class="plans__title">Planos de saúde disponíveis para você</h2>
-      <span class="plans__description"
-        >Encontramos {{ plans.total }} opções</span
-      >
-      <ul>
-        <li v-for="(plan, index) in plans.planos" :key="index">
-          <div class="container">
-            <div class="plans__info">
-              <img :src="plan.operadoraLogo" :alt="plan.plano" />
-              <h3>{{ plan.nome_plano_ans }}</h3>
-              <p>{{ plan.segmentacao }}</p>
-            </div>
+      <div v-if="!showPlansList">
+        <h2 class="plans__title">Desculpe, não encontramos nada por aqui</h2>
+        <p class="plans__description">
+          No momento não temos nenhum plano disponível pra você.
+        </p>
+      </div>
 
-            <span class="plans__price">
-              <img
-                src="../assets/dollar.svg"
-                alt="Ilustração representando uma moeda"
-              />
-              R$ {{ plan.precos.total }}
-            </span>
-          </div>
-        </li>
-      </ul>
+      <div v-if="showPlansList">
+        <h2 class="plans__title">Planos de saúde disponíveis para você</h2>
+        <p class="plans__description">Encontramos {{ plans.total }} opções</p>
+        <ul>
+          <li v-for="(plan, index) in plans.planos" :key="index">
+            <div class="container">
+              <div class="plans__info">
+                <img :src="plan.operadoraLogo" :alt="plan.plano" />
+                <h3>{{ plan.nome_plano_ans }}</h3>
+                <p>{{ plan.segmentacao }}</p>
+              </div>
+
+              <span class="plans__price">
+                <img
+                  src="../assets/dollar.svg"
+                  alt="Ilustração representando uma moeda"
+                />
+                R$ {{ plan.precos.total }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
     </section>
   </main>
 </template>
@@ -129,6 +136,7 @@ export default {
     return {
       loading: false,
       showPlans: false,
+      showPlansList: false,
       states: [],
       cities: [],
       occupations: [],
@@ -147,7 +155,7 @@ export default {
         this.states = res.data;
       });
     } catch (error) {
-      console.log(error);
+      alert("Desculpe, ocorreu algo erro ao consultar a api do IBGE");
     }
   },
   methods: {
@@ -160,7 +168,7 @@ export default {
           this.cities = res.data;
         });
       } catch (error) {
-        console.log(error);
+        alert("Desculpe, ocorreu algo erro ao consultar a api do IBGE");
       } finally {
         this.loading = false;
       }
@@ -210,10 +218,11 @@ export default {
           },
         }).then((res) => {
           this.plans = res.data;
-          console.log(this.selectedDate);
+          this.showPlansList = true;
         });
       } catch (error) {
         console.log(error);
+        this.showPlansList = false;
       } finally {
         this.loading = false;
         this.showPlans = true;
@@ -410,9 +419,27 @@ form {
   }
 
   .plans {
+    &__title {
+      font-size: 2.5rem;
+    }
+    &__description {
+      font-size: 1.4rem;
+      max-width: 80%;
+      margin: 0 auto;
+    }
     ul {
       padding-left: 0;
       grid-template-columns: 1fr;
+      justify-items: center;
+    }
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1300px) {
+  .plans {
+    ul {
+      grid-template-columns: 1fr 1fr;
     }
   }
 }

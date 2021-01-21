@@ -40,7 +40,7 @@
       </li>
       <li>
         <a
-          href="https://msng.link/o/?fernandosilvaoliveira=tg"
+          href="https://t.me/fernandosilvaoliveira"
           target="_blank"
           rel="noopener noreferrer"
         >

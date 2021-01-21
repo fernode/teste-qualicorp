@@ -34,6 +34,7 @@ html {
 
 body {
   background: #060369;
+  height: 100vh;
   font-family: "Roboto", sans-serif;
 }
 </style>
