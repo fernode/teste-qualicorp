@@ -8,16 +8,48 @@
         v-on:change="getCities($event)"
         v-model="selectedState"
       >
-        <option value="default" disabled selected>Selecione seu estado</option>
+        <option value="" disabled selected>Selecione seu estado</option>
         <option v-for="state in states" :key="state.sigla" :value="state.sigla">
           {{ state.sigla }}
         </option>
       </select>
 
-      <select name="city" id="city" v-on:change="getCarrer($event)">
-        <option value="default" disabled selected>Selecione sua cidade</option>
+      <select
+        name="city"
+        id="city"
+        v-on:change="getOccupation($event)"
+        v-model="selectedCity"
+      >
+        <option value="" disabled selected>Selecione sua cidade</option>
         <option v-for="city in cities" :key="city.id" :value="city.nome">
           {{ city.nome }}
+        </option>
+      </select>
+
+      <select
+        name="occupation"
+        id="occupation"
+        v-model="selectedOcupation"
+        v-on:change="getEntities($event)"
+      >
+        <option value="" disabled selected>Selecione sua profissão</option>
+        <option
+          v-for="occupation in occupations"
+          :key="occupation.profissao"
+          :value="occupation.profissao"
+        >
+          {{ occupation.profissao }}
+        </option>
+      </select>
+
+      <select name="entity" id="entity" v-model="selectedEntity">
+        <option value="" disabled selected>Selecione sua Entidade</option>
+        <option
+          v-for="entity in entities"
+          :key="entity.RazaoSocial"
+          :value="entity.RazaoSocial"
+        >
+          {{ entity.NomeFantasia }} - {{ entity.RazaoSocial }}
         </option>
       </select>
     </form>
@@ -26,7 +58,7 @@
 
 <script>
 import { ibgeEndpoint, qualicorpEndpoint } from "@/services/api.js";
-import apiKey from "@/qualicorpKey.js";
+import { apiKey1, apiKey2 } from "@/qualicorpKey.js";
 
 export default {
   name: "SearchPlans",
@@ -34,7 +66,12 @@ export default {
     return {
       states: [],
       cities: [],
+      occupations: [],
+      entities: [],
       selectedState: "",
+      selectedCity: "",
+      selectedOcupation: "",
+      selectedEntity: "",
     };
   },
   mounted() {
@@ -58,14 +95,23 @@ export default {
         console.log(error);
       }
     },
-    getCarrer: async function (e) {
-      const city = e.target.value;
-
+    getOccupation: async function () {
       try {
         await qualicorpEndpoint(
-          `/profissao/${this.selectedState}/${city}?api-key=${apiKey}`
+          `/profissao/${this.selectedState}/${this.selectedCity}?api-key=${apiKey1}`
         ).then((res) => {
-          console.log(res.data);
+          this.occupations = res.data;
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getEntities: async function () {
+      try {
+        await qualicorpEndpoint(
+          `/entidade/${this.selectedOcupation}/${this.selectedState}/${this.selectedCity}?api-key=${apiKey2}`
+        ).then((res) => {
+          this.entities = res.data;
         });
       } catch (error) {
         console.log(error);
