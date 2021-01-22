@@ -30,6 +30,7 @@ html {
   padding: 0;
   font-size: 62.5%;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 body {
