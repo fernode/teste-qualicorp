@@ -91,13 +91,15 @@
       <div v-if="!showPlansList">
         <h2 class="plans__title">Desculpe, não encontramos nada por aqui</h2>
         <p class="plans__description">
-          No momento não temos nenhum plano disponível pra você.
+          No momento não temos nenhum plano disponível pra você &#128542;.
         </p>
       </div>
 
       <div v-if="showPlansList">
         <h2 class="plans__title">Planos de saúde disponíveis para você</h2>
-        <p class="plans__description">Encontramos {{ plans.total }} opções</p>
+        <p class="plans__description">
+          Encontramos <span>{{ plans.total }} opções</span> &#128515;
+        </p>
         <ul>
           <li v-for="(plan, index) in plans.planos" :key="index">
             <div class="container">
@@ -217,11 +219,15 @@ export default {
             datanascimento: [this.selectedDate],
           },
         }).then((res) => {
+          if (res.data.total === 0) {
+            this.showPlansList = false;
+            return;
+          }
+
           this.plans = res.data;
           this.showPlansList = true;
         });
       } catch (error) {
-        console.log(error);
         this.showPlansList = false;
       } finally {
         this.loading = false;
@@ -353,6 +359,10 @@ form {
     color: white;
     margin-bottom: 3rem;
     text-align: center;
+
+    span {
+      font-weight: bold;
+    }
   }
 
   &__info {
