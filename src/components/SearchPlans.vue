@@ -412,7 +412,7 @@ form {
       width: 26rem;
       margin-top: 3rem;
       border-radius: 10px;
-      height: 25rem;
+      height: 28rem;
     }
   }
 }
